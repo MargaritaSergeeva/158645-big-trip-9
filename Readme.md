@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Маргарита Сергеева](https://up.htmlacademy.ru/ecmascript/9/user/158645).
-* Наставник: `Неизвестно`.
+* Наставник: [Сергей Рубец](https://htmlacademy.ru/profile/amator).
 
 ---
 
