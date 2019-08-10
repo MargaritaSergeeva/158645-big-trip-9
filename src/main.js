@@ -13,12 +13,12 @@ const headerElement = document.querySelector(`.page-header`);
 const tripInfoElement = headerElement.querySelector(`.trip-info`);
 const tripControlsElement = headerElement.querySelector(`.trip-controls`);
 const tripControlHeadersCollectionElement = tripControlsElement.querySelectorAll(`h2`);
-const mainElement = document.querySelector(`.main`);
+const mainElement = document.querySelector(`.page-main`);
 const tripEventsElement = mainElement.querySelector(`.trip-events`);
 
 const renderComponent = (element, container, place) => container.insertAdjacentHTML(place, element);
 
-renderComponent(getMainTripTemplate(), tripInfoElement, `beforeend`);
+renderComponent(getMainTripTemplate(), tripInfoElement, `afterbegin`);
 renderComponent(getSiteMenuTemplate(), tripControlHeadersCollectionElement[0], `afterend`);
 renderComponent(getFilterTemplate(), tripControlHeadersCollectionElement[1], `afterend`);
 renderComponent(getTripSortingTemplate(), tripEventsElement, `beforeend`);
@@ -28,9 +28,9 @@ const tripDaysListElement = mainElement.querySelector(`.trip-days`);
 
 renderComponent(getTripDayItemTemplate(), tripDaysListElement, `beforeend`);
 
-const tripDayItemElement = mainElement.querySelector(`.day`);
+const tripEventsListElement = mainElement.querySelector(`.trip-events__list`);
 
-new Array(EVENT_ITEM_COUNT).fill(``).forEach(() => renderComponent(getTripEventItemTemplate(), tripDayItemElement, `beforeend`));
+new Array(EVENT_ITEM_COUNT).fill(``).forEach(() => renderComponent(getTripEventItemTemplate(), tripEventsListElement, `beforeend`));
 
 const tripEventItemCollectionElement = mainElement.querySelectorAll(`.trip-events__item`);
 

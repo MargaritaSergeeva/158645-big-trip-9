@@ -14,7 +14,7 @@ const getSortingInputTemplate = (value, isArrow = false, isChecked = false) => (
     ${isChecked ? ` checked` : ``}>
     <label class="trip-sort__btn" for="sort-${value}">
     ${value[0].toUpperCase() + value.slice(1)}
-    ${isArrow ? getSortingArrowTemplate() : ``}>
+    ${isArrow ? getSortingArrowTemplate() : ``}
     </label>
   </div>`
 );
