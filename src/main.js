@@ -8,7 +8,7 @@ import {getTripEventItemTemplate} from './components/trip-event-item.js';
 import {getEditEventTemplate} from './components/event-edit.js';
 import {getEventTemplate} from './components/event.js';
 
-const EVENT_ITEM_COUNT = 4;
+const EVENT_ITEM_COUNT = 3;
 const headerElement = document.querySelector(`.page-header`);
 const tripInfoElement = headerElement.querySelector(`.trip-info`);
 const tripControlsElement = headerElement.querySelector(`.trip-controls`);
@@ -22,6 +22,7 @@ renderComponent(getMainTripTemplate(), tripInfoElement, `afterbegin`);
 renderComponent(getSiteMenuTemplate(), tripControlHeadersCollectionElement[0], `afterend`);
 renderComponent(getFilterTemplate(), tripControlHeadersCollectionElement[1], `afterend`);
 renderComponent(getTripSortingTemplate(), tripEventsElement, `beforeend`);
+renderComponent(getEditEventTemplate(), tripEventsElement, `beforeend`);
 renderComponent(getTripDaysListTemplate(), tripEventsElement, `beforeend`);
 
 const tripDaysListElement = mainElement.querySelector(`.trip-days`);
@@ -32,6 +33,6 @@ const tripEventsListElement = mainElement.querySelector(`.trip-events__list`);
 
 new Array(EVENT_ITEM_COUNT).fill(``).forEach(() => renderComponent(getTripEventItemTemplate(), tripEventsListElement, `beforeend`));
 
-const tripEventItemCollectionElement = mainElement.querySelectorAll(`.trip-events__item`);
+const tripEventItemCollectionElement = tripEventsListElement.querySelectorAll(`.trip-events__item`);
 
-tripEventItemCollectionElement.forEach((it, index) => index === 0 ? renderComponent(getEditEventTemplate(), it, `beforeend`) : renderComponent(getEventTemplate(), it, `beforeend`));
+tripEventItemCollectionElement.forEach((it) => renderComponent(getEventTemplate(), it, `beforeend`));
