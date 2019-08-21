@@ -1,3 +1,4 @@
+import {getEventData} from './data.js';
 import {getSiteMenuTemplate} from './components/site-menu.js';
 import {getMainTripTemplate} from './components/main-trip.js';
 import {getFilterTemplate} from './components/filter.js';
@@ -15,6 +16,7 @@ const tripControlsElement = headerElement.querySelector(`.trip-controls`);
 const tripControlHeadersCollectionElement = tripControlsElement.querySelectorAll(`h2`);
 const mainElement = document.querySelector(`.page-main`);
 const tripEventsElement = mainElement.querySelector(`.trip-events`);
+const events = new Array(EVENT_ITEM_COUNT).fill(``).map(getEventData);
 
 const renderComponent = (element, container, place) => container.insertAdjacentHTML(place, element);
 
@@ -35,4 +37,4 @@ new Array(EVENT_ITEM_COUNT).fill(``).forEach(() => renderComponent(getTripEventI
 
 const tripEventItemCollectionElement = tripEventsListElement.querySelectorAll(`.trip-events__item`);
 
-tripEventItemCollectionElement.forEach((it) => renderComponent(getEventTemplate(), it, `beforeend`));
+tripEventItemCollectionElement.forEach((it) => renderComponent(getEventTemplate(getEventData()), it, `beforeend`));
