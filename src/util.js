@@ -1,4 +1,4 @@
-const TEN = 10;
+const TOP_TEN = 10;
 const MIN_MS_COUNT = 360000;
 const MAX_MS_COUNT = 36000000;
 
@@ -61,6 +61,6 @@ export default {
   },
 
   getNumberWithZero(number) {
-    return number < TEN ? `0` + number : number;
+    return number < TOP_TEN ? `0` + number : number;
   }
 };

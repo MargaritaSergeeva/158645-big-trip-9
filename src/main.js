@@ -55,4 +55,3 @@ renderComponent(getFilterTemplate(getFilterData()), tripControlHeadersCollection
 renderComponent(getTripSortingTemplate(getSortingData()), tripEventsElement, `beforeend`);
 renderComponent(getTripDaysListTemplate(unicDays, sortedEvents), tripEventsElement, `beforeend`);
 renderTotalPrice(sortedEvents);
-
