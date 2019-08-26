@@ -1,10 +1,14 @@
 import util from './util.js';
+import constant from './constant.js';
 import {getEventData, getMenuData, getFilterData, getSortingData} from './data.js';
-import {getSiteMenuTemplate} from './components/site-menu.js';
-import {getMainTripTemplate} from './components/main-trip.js';
-import {getFilterTemplate} from './components/filter.js';
-import {getTripSortingTemplate} from './components/trip-sorting.js';
-import {getTripDaysListTemplate} from './components/trip-days-list.js';
+import SiteMenu from './components/site-menu.js';
+import MainTrip from './components/main-trip.js';
+import Filter from './components/filter.js';
+import TripSorting from './components/trip-sorting.js';
+import TripDaysList from './components/trip-days-list.js';
+import TripDayItem from './components/trip-day-item.js';
+import EventEdit from './components/event-edit.js';
+import Event from './components/event.js';
 
 const EVENT_ITEM_COUNT = 20;
 const MIN_OPTION_COUNT = 0;
@@ -39,7 +43,56 @@ const cities = sortedEvents
   .slice()
   .map(({city}) => city);
 
-const renderComponent = (element, container, place) => container.insertAdjacentHTML(place, element);
+
+const renderEvent = (eventItem, eventContainer) => {
+  const event = new Event(eventItem);
+  const eventEdit = new EventEdit(eventItem);
+
+  const onEscKeyDown = (evt) => {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      eventContainer.replaceChild(event.getElement(), eventEdit.getElement());
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  event.getElement()
+    .querySelector(`.event__rollup-btn`)
+    .addEventListener(`click`, () => {
+      eventContainer.replaceChild(eventEdit.getElement(), event.getElement());
+      document.addEventListener(`keydown`, onEscKeyDown);
+    });
+
+  eventEdit.getElement()
+  .querySelector(`.event__rollup-btn`)
+  .addEventListener(`click`, () => {
+    eventContainer.replaceChild(event.getElement(), eventEdit.getElement());
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
+
+  eventEdit.getElement()
+    .querySelector(`form`)
+    .addEventListener(`submit`, () => {
+      eventContainer.replaceChild(event.getElement(), eventEdit.getElement());
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    });
+
+  util.render(eventContainer, event.getElement(), constant.Position.BEFOREEND);
+};
+
+const renderEvents = (day, eventsArr, container) => {
+  eventsArr
+  .filter(({timeStart}) => (new Date(timeStart)).toDateString() === day)
+  .forEach((eventItem) => renderEvent(eventItem, container));
+};
+
+const renderTripDayItem = (eventsArr, daysArr, container) => {
+  daysArr.forEach((day, index) => {
+    const tripDayItem = new TripDayItem(day, index).getElement();
+    util.render(container, tripDayItem, constant.Position.BEFOREEND);
+    const tripEventsList = tripDayItem.querySelector(`.trip-events__list`);
+    renderEvents(day, eventsArr, tripEventsList);
+  });
+};
 
 const renderTotalPrice = (eventsArr) => {
   eventsArr.forEach((it) => {
@@ -49,9 +102,12 @@ const renderTotalPrice = (eventsArr) => {
   totalElement.textContent = totalPrice;
 };
 
-renderComponent(getMainTripTemplate(cities, unicDays), tripInfoElement, `afterbegin`);
-renderComponent(getSiteMenuTemplate(getMenuData()), tripControlHeadersCollectionElement[0], `afterend`);
-renderComponent(getFilterTemplate(getFilterData()), tripControlHeadersCollectionElement[1], `afterend`);
-renderComponent(getTripSortingTemplate(getSortingData()), tripEventsElement, `beforeend`);
-renderComponent(getTripDaysListTemplate(unicDays, sortedEvents), tripEventsElement, `beforeend`);
+util.render(tripInfoElement, new MainTrip(cities, unicDays).getElement(), constant.Position.AFTERBEGIN);
+util.render(tripControlHeadersCollectionElement[0], new SiteMenu(getMenuData()).getElement(), constant.Position.AFTER);
+util.render(tripControlHeadersCollectionElement[1], new Filter(getFilterData()).getElement(), constant.Position.AFTER);
+util.render(tripEventsElement, new TripSorting(getSortingData()).getElement(), constant.Position.BEFOREEND);
+util.render(tripEventsElement, new TripDaysList().getElement(), constant.Position.BEFOREEND);
+
+const tripDaysListElement = tripEventsElement.querySelector(`.trip-days`);
+renderTripDayItem(sortedEvents, unicDays, tripDaysListElement);
 renderTotalPrice(sortedEvents);
