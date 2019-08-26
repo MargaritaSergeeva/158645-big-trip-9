@@ -16,13 +16,13 @@ const getDuration = (start, end) => {
 };
 
 export default class Event {
-  constructor({type, city, checkedOptions, timeStart, timeEnd, price}) {
-    this._type = type;
-    this._city = city;
-    this._checkedOptions = checkedOptions;
-    this._timeStart = timeStart;
-    this._timeEnd = timeEnd;
-    this._price = price;
+  constructor(events) {
+    this._type = events.type;
+    this._city = events.city;
+    this._checkedOptions = events.checkedOptions;
+    this._timeStart = events.timeStart;
+    this._timeEnd = events.timeEnd;
+    this._price = events.price;
     this._element = null;
   }
 

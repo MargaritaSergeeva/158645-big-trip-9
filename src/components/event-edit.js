@@ -1,20 +1,20 @@
 import util from '../util.js';
 
 export default class EventEdit {
-  constructor({types, type, cities, city, options, checkedOptions, timeStart, timeEnd, price, description, photos, isFavorite}) {
-    this._types = types;
-    this._type = type;
-    this._cities = cities;
-    this._city = city;
-    this._options = options;
-    this._checkedOptions = checkedOptions;
-    this._timeStart = new Date(timeStart);
-    this._timeEnd = new Date(timeEnd);
-    this._price = price;
-    this._description = description;
+  constructor(events) {
+    this._types = events.types;
+    this._type = events.type;
+    this._cities = events.cities;
+    this._city = events.city;
+    this._options = events.options;
+    this._checkedOptions = events.checkedOptions;
+    this._timeStart = new Date(events.timeStart);
+    this._timeEnd = new Date(events.timeEnd);
+    this._price = events.price;
+    this._description = events.description;
+    this._photos = events.photos;
+    this._isFavorite = events.isFavorite;
     this._element = null;
-    this._photos = photos;
-    this._isFavorite = isFavorite;
   }
 
   getElement() {

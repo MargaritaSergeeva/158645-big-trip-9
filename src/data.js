@@ -1,5 +1,6 @@
 import util from './util.js';
 
+const MIN_SENTENСES_COUNT = 1;
 const MAX_SENTENСES_COUNT = 3;
 const DAYS_COUNT = 7;
 const HOURS_COUNT = 24;
@@ -76,10 +77,10 @@ export const getEventData = () => ({
   ],
   photos: new Array(util.getScale(3, 8)).fill(``).map(getRandomPhoto),
   description:
-  `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`
+  `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus`
   .split(`. `)
   .sort(() => Math.random() - 0.5)
-  .slice(0, Math.round(Math.random() * MAX_SENTENСES_COUNT))
+  .slice(0, MIN_SENTENСES_COUNT + Math.round(Math.random() * MAX_SENTENСES_COUNT))
   .join(`. `),
   options: [
     {
