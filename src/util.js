@@ -1,3 +1,5 @@
+import constant from './constant.js';
+
 const SINGLE_DIGIT_LIMIT = 10;
 const MIN_MS_COUNT = 360000;
 const MAX_MS_COUNT = 36000000;
@@ -62,5 +64,31 @@ export default {
 
   getNumberWithZero(number) {
     return number < SINGLE_DIGIT_LIMIT ? `0` + number : number;
-  }
+  },
+
+  createElement(template) {
+    const newElement = document.createElement(`div`);
+    newElement.innerHTML = template;
+    return newElement.firstChild;
+  },
+
+  render(container, element, place) {
+    switch (place) {
+      case constant.Position.AFTERBEGIN:
+        container.prepend(element);
+        break;
+      case constant.Position.BEFOREEND:
+        container.append(element);
+        break;
+      case constant.Position.AFTER:
+        container.after(element);
+        break;
+    }
+  },
+
+  unrender(element) {
+    if (element) {
+      element.remove();
+    }
+  },
 };

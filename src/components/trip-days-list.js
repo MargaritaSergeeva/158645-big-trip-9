@@ -1,11 +1,25 @@
-import {getTripDayItemTemplate} from './trip-day-item.js';
+import util from '../util.js';
 
-const renderDays = (days, events) => (
-  days.map((day, index) => getTripDayItemTemplate(day, events, index)).join(``)
-);
+export default class TripDaysList {
+  constructor() {
+    this._element = null;
+  }
 
-export const getTripDaysListTemplate = (days, events) => (
-  `<ul class="trip-days">
-    ${renderDays(days, events)}
-  </ul>`.trim()
-);
+  getElement() {
+    if (!this._element) {
+      this._element = util.createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return `<ul class="trip-days">
+    </ul>`.trim();
+  }
+}
+

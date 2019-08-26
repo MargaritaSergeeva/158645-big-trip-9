@@ -1,36 +1,36 @@
-import {getEditEventTemplate} from './event-edit.js';
-import {getEventTemplate} from './event.js';
+import util from '../util.js';
+import constant from '../constant.js';
 
-const renderEvents = (day, [firstEvent, ...otherEvents], index) => {
-  let event;
-
-  if (index === 0) {
-    event = `${getEditEventTemplate(firstEvent)}
-    ${otherEvents
-      .filter(({timeStart}) => (new Date(timeStart)).toDateString() === day)
-      .map((it) => getEventTemplate(it))
-      .join(``)}`
-    .trim();
-  } else {
-    event = `${otherEvents
-      .filter(({timeStart}) => (new Date(timeStart)).toDateString() === day)
-      .map((it) => getEventTemplate(it))
-      .join(``)}`
-    .trim();
+export default class TripDayItem {
+  constructor(day, index) {
+    this._day = day;
+    this._index = index;
+    this._element = null;
   }
 
-  return event;
-};
+  getElement() {
+    if (!this._element) {
+      this._element = util.createElement(this.getTemplate());
+    }
 
-export const getTripDayItemTemplate = (day, events, index) => (
-  `<li class="trip-days__item  day">
-    <div class="day__info">
-      <span class="day__counter">${index + 1}</span>
-      <time class="day__date" datetime="2019-03-18">${day.slice(4, 11)}</time>
-    </div>
+    return this._element;
+  }
 
-    <ul class="trip-events__list">
-      ${renderEvents(day, events, index)}
-    </ul>
-  </li>`.trim()
-);
+  removeElement() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return `<li class="trip-days__item  day">
+      <div class="day__info">
+        <span class="day__counter">${this._index + 1}</span>
+        <time class="day__date" datetime="${this._day.slice(11, 16)}-${constant.monthMap[this._day.slice(4, 7)]}-${this._day.slice(8, 10)}">
+          ${this._day.slice(4, 11)}
+        </time>
+      </div>
+
+      <ul class="trip-events__list">
+      </ul>
+    </li>`.trim();
+  }
+}
