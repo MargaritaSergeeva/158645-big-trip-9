@@ -9,6 +9,7 @@ import TripDaysList from './components/trip-days-list.js';
 import TripDayItem from './components/trip-day-item.js';
 import EventEdit from './components/event-edit.js';
 import Event from './components/event.js';
+import MessageNoEvents from './components/message-no-events.js';
 
 const EVENT_ITEM_COUNT = 20;
 const MIN_OPTION_COUNT = 0;
@@ -102,12 +103,17 @@ const renderTotalPrice = (eventsArr) => {
   totalElement.textContent = totalPrice;
 };
 
-util.render(tripInfoElement, new MainTrip(cities, unicDays).getElement(), constant.Position.AFTERBEGIN);
 util.render(tripControlHeadersCollectionElement[0], new SiteMenu(getMenuData()).getElement(), constant.Position.AFTER);
 util.render(tripControlHeadersCollectionElement[1], new Filter(getFilterData()).getElement(), constant.Position.AFTER);
-util.render(tripEventsElement, new TripSorting(getSortingData()).getElement(), constant.Position.BEFOREEND);
-util.render(tripEventsElement, new TripDaysList().getElement(), constant.Position.BEFOREEND);
 
-const tripDaysListElement = tripEventsElement.querySelector(`.trip-days`);
-renderTripDayItem(sortedEvents, unicDays, tripDaysListElement);
-renderTotalPrice(sortedEvents);
+if (sortedEvents.length > 0) {
+  util.render(tripInfoElement, new MainTrip(cities, unicDays).getElement(), constant.Position.AFTERBEGIN);
+  util.render(tripEventsElement, new TripSorting(getSortingData()).getElement(), constant.Position.BEFOREEND);
+  util.render(tripEventsElement, new TripDaysList().getElement(), constant.Position.BEFOREEND);
+
+  const tripDaysListElement = tripEventsElement.querySelector(`.trip-days`);
+  renderTripDayItem(sortedEvents, unicDays, tripDaysListElement);
+  renderTotalPrice(sortedEvents);
+} else {
+  util.render(tripEventsElement, new MessageNoEvents().getElement(), constant.Position.BEFOREEND);
+}
