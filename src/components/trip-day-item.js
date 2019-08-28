@@ -1,23 +1,11 @@
-import util from '../util.js';
 import constant from '../constant.js';
+import AbstractComponent from './abstract-component.js';
 
-export default class TripDayItem {
+export default class TripDayItem extends AbstractComponent {
   constructor(day, index) {
+    super();
     this._day = day;
     this._index = index;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {

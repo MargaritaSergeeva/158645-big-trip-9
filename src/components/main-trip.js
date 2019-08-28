@@ -1,4 +1,4 @@
-import util from '../util.js';
+import AbstractComponent from './abstract-component.js';
 
 const FIRST_LETTER_INDEX = 4;
 const LAST_LETTER_INDEX = 11;
@@ -8,23 +8,11 @@ const getMonthAndDate = (day) => {
   return day.slice(FIRST_LETTER_INDEX, LAST_LETTER_INDEX);
 };
 
-export default class MainTrip {
+export default class MainTrip extends AbstractComponent {
   constructor(cities, days) {
+    super();
     this._cities = cities;
     this._days = days;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {

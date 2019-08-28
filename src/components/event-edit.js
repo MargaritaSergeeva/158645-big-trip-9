@@ -1,7 +1,9 @@
 import util from '../util.js';
+import AbstractComponent from './abstract-component.js';
 
-export default class EventEdit {
+export default class EventEdit extends AbstractComponent {
   constructor(events) {
+    super();
     this._types = events.types;
     this._type = events.type;
     this._cities = events.cities;
@@ -14,19 +16,6 @@ export default class EventEdit {
     this._description = events.description;
     this._photos = events.photos;
     this._isFavorite = events.isFavorite;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {

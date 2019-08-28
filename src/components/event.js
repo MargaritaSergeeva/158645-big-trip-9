@@ -1,4 +1,5 @@
 import util from '../util.js';
+import AbstractComponent from './abstract-component.js';
 
 const HOURS_COUNT = 24;
 const MIN_COUNT = 60;
@@ -15,27 +16,15 @@ const getDuration = (start, end) => {
   return numberOfDays > 0 ? `${numberOfDays}D ${numberOfHours}H ${numberOfMinutes}M` : `${numberOfHours}H ${numberOfMinutes}M`;
 };
 
-export default class Event {
+export default class Event extends AbstractComponent {
   constructor(events) {
+    super();
     this._type = events.type;
     this._city = events.city;
     this._checkedOptions = events.checkedOptions;
     this._timeStart = events.timeStart;
     this._timeEnd = events.timeEnd;
     this._price = events.price;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {
