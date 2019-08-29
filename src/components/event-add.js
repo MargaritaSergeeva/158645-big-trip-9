@@ -1,21 +1,9 @@
-import util from '../util.js';
+import AbstractComponent from './abstract-component.js';
 
-export default class EventAdd {
+export default class EventAdd extends AbstractComponent {
   constructor({types}) {
-    this._element = null;
+    super();
     this._types = types;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {

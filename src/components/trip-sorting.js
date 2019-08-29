@@ -1,4 +1,4 @@
-import util from '../util.js';
+import AbstractComponent from './abstract-component.js';
 
 const getSortingArrowTemplate = () => (
   `<svg class="trip-sort__direction-icon" width="8" height="10" viewBox="0 0 8 10">
@@ -10,22 +10,10 @@ const getSortingPointTemplate = (value) => (
   `<span class="trip-sort__item  trip-sort__item--${value}">${value[0].toUpperCase() + value.slice(1)}</span>`.trim()
 );
 
-export default class TripSorting {
+export default class TripSorting extends AbstractComponent {
   constructor(sorts) {
+    super();
     this._sorts = sorts;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = util.createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {
