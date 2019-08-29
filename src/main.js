@@ -1,10 +1,9 @@
 import util from './util.js';
 import constant from './constant.js';
-import {getEventData, getMenuData, getFilterData, getSortingData} from './data.js';
+import {getEventData, getMenuData, getFilterData} from './data.js';
 import SiteMenu from './components/site-menu.js';
 import MainTrip from './components/main-trip.js';
 import Filter from './components/filter.js';
-import TripSorting from './components/trip-sorting.js';
 import {TripController} from './controllers/trip.js';
 import MessageNoEvents from './components/message-no-events.js';
 
@@ -58,7 +57,6 @@ util.render(tripControlHeadersCollectionElement[1], new Filter(getFilterData()).
 
 if (sortedEvents.length > 0) {
   util.render(tripInfoElement, new MainTrip(cities, unicDays).getElement(), constant.Position.AFTERBEGIN);
-  util.render(tripEventsElement, new TripSorting(getSortingData()).getElement(), constant.Position.BEFOREEND);
   tripController.init();
   renderTotalPrice(sortedEvents);
 } else {
