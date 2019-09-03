@@ -17,6 +17,7 @@ export default class EventEdit extends AbstractComponent {
     this._description = events.city.description;
     this._photos = events.city.photos;
     this._isFavorite = events.isFavorite;
+    this._event = this.getElement();
 
     this._subscribeOnEvents();
   }
@@ -143,70 +144,24 @@ export default class EventEdit extends AbstractComponent {
     </li>`.trim();
   }
 
-  _isTypeChecked(currentTypeName, checkedTypeName) {
-    return currentTypeName === checkedTypeName ? ` checked` : ``;
+  _getOffersTemplate(options) {
+    return `<h3 class="event__section-title  event__section-title--offers">Offers</h3>
+    <div class="event__available-offers">
+      ${options.map((option) => `
+      <div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${option.name}-1" type="checkbox" name="event-offer" value="${option.name}">
+        <label class="event__offer-label event__offer-label--${option.name}" for="event-offer-${option.name}-1">
+          <span class="event__offer-title">${option.description}</span>
+          &plus;
+          &euro;&nbsp;<span class="event__offer-price">${option.cost}</span>
+        </label>
+      </div>`
+  .trim())
+  .join(``)}`;
   }
 
-  _isElementContainsClass(element, className) {
-    return element.classList.contains(className);
-  }
-
-  _isElementChecked(element) {
-    return element.checked;
-  }
-
-  _switchCheckingElement(element) {
-    element.checked = this._isElementChecked(element) ? false : true;
-  }
-
-  _subscribeOnEvents() {
-    this.getElement().querySelector(`.event__section--offers`).addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-
-      if (this._isElementContainsClass(evt.target, `event__offer-label`)) {
-        const input = this.getElement().querySelector(`#${evt.target.htmlFor}`);
-        this._switchCheckingElement(input);
-      }
-
-      if (this._isElementContainsClass(evt.target.parentNode, `event__offer-label`)) {
-        const input = this.getElement().querySelector(`#${evt.target.parentNode.htmlFor}`);
-        this._switchCheckingElement(input);
-      }
-    });
-
-
-    this.getElement().querySelector(`.event__type-group`).addEventListener(`click`, (evt) => {
-
-      if (this._isElementContainsClass(evt.target, `event__type-label`)) {
-        const icon = this.getElement().querySelector(`.event__type-icon`);
-        icon.src = `img/icons/${evt.target.textContent}.png`;
-
-        const eventPlaceholder = this.getElement().querySelector(`.event__label`);
-        eventPlaceholder.textContent = util.getEventTitle(evt.target.textContent);
-
-        const options = this._types.find((type) => type.name === evt.target.textContent).options ? this._types.find((type) => type.name === evt.target.textContent).options : ``;
-        this.getElement().querySelector(`.event__section--offers`).innerHTML = ``;
-        this.getElement().querySelector(`.event__section--offers`).insertAdjacentHTML(constant.Position.BEFOREEND, `${options ? `<h3 class="event__section-title  event__section-title--offers">Offers</h3>
-          <div class="event__available-offers">
-            ${options.map((option) => `
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-${option.name}-1" type="checkbox" name="event-offer" value="${option.name}">
-              <label class="event__offer-label event__offer-label--${option.name}" for="event-offer-${option.name}-1">
-                <span class="event__offer-title">${option.description}</span>
-                &plus;
-                &euro;&nbsp;<span class="event__offer-price">${option.cost}</span>
-              </label>
-            </div>`
-        .trim())
-        .join(``)}` : ``}`);
-      }
-    });
-
-
-    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
-      const newCity = this._cities.find((city) => city.name === evt.target.value) ? this._cities.find((city) => city.name === evt.target.value) : ``;
-      this.getElement().querySelector(`.event__section--destination`).innerHTML = ``;
-      this.getElement().querySelector(`.event__section--destination`).insertAdjacentHTML(constant.Position.BEFOREEND, `<h3 class="event__section-title  event__section-title--destination">Destination</h3>
+  _getDestinationTemplate(newCity) {
+    return `<h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">${newCity.description}</p>
       <div class="event__photos-container">
         <div class="event__photos-tape">
@@ -214,7 +169,55 @@ export default class EventEdit extends AbstractComponent {
           .trim())
           .join(``)}
         </div>
-      </div>;`);
+      </div>;`;
+  }
+
+  _isTypeChecked(currentTypeName, checkedTypeName) {
+    return currentTypeName === checkedTypeName ? ` checked` : ``;
+  }
+
+  _switchCheckingElement(element) {
+    element.checked = !util.isElementChecked(element);
+  }
+
+  _subscribeOnEvents() {
+    const offersElement = this._event.querySelector(`.event__section--offers`);
+    offersElement.addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+
+      if (util.isElementContainsClass(evt.target, `event__offer-label`)) {
+        const inputElement = this._event.querySelector(`#${evt.target.htmlFor}`);
+        this._switchCheckingElement(inputElement);
+      }
+
+      if (util.isElementContainsClass(evt.target.parentNode, `event__offer-label`)) {
+        const inputElement = this._event.querySelector(`#${evt.target.parentNode.htmlFor}`);
+        this._switchCheckingElement(inputElement);
+      }
+    });
+
+    const typeGroupElement = this._event.querySelector(`.event__type-group`);
+    typeGroupElement.addEventListener(`click`, (evt) => {
+
+      if (util.isElementContainsClass(evt.target, `event__type-label`)) {
+        const icon = this._event.querySelector(`.event__type-icon`);
+        icon.src = `img/icons/${evt.target.textContent}.png`;
+
+        const eventPlaceholder = this._event.querySelector(`.event__label`);
+        eventPlaceholder.textContent = util.getEventTitle(evt.target.textContent);
+
+        const options = this._types.find((type) => type.name === evt.target.textContent).options ? this._types.find((type) => type.name === evt.target.textContent).options : ``;
+        util.cleanElement(offersElement);
+        offersElement.insertAdjacentHTML(constant.Position.BEFOREEND, `${options ? this._getOffersTemplate(options) : ``}`);
+      }
+    });
+
+    const inputDestinationElement = this._event.querySelector(`.event__input--destination`);
+    inputDestinationElement.addEventListener(`change`, (evt) => {
+      const newCity = this._cities.find((city) => city.name === evt.target.value);
+      const sectionDestinationElement = this._event.querySelector(`.event__section--destination`);
+      util.cleanElement(sectionDestinationElement);
+      sectionDestinationElement.insertAdjacentHTML(constant.Position.BEFOREEND, this._getDestinationTemplate(newCity));
     });
   }
 }

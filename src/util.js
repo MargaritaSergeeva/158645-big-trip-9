@@ -91,4 +91,16 @@ export default {
       element.remove();
     }
   },
+
+  isElementContainsClass(element, className) {
+    return element.classList.contains(className);
+  },
+
+  isElementChecked(element) {
+    return element.checked;
+  },
+
+  cleanElement(element) {
+    element.innerHTML = ``;
+  },
 };

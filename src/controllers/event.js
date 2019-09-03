@@ -46,8 +46,8 @@ export class EventController {
       .addEventListener(`submit`, (evt) => {
         evt.preventDefault(evt);
         const formData = new FormData(this._eventEdit.getElement().querySelector(`.event--edit`));
-        const allTypes = this._eventEdit.getElement().querySelectorAll(`.event__type-input`);
-        const checkedTypeName = Array.from(allTypes).filter((it) => it.checked).map((it) => it.value).join(``);
+        const allTypesElements = this._eventEdit.getElement().querySelectorAll(`.event__type-input`);
+        const checkedTypeName = Array.from(allTypesElements).filter((it) => it.checked).map((it) => it.value).join(``);
 
         this._newEventData.type = this._newEventData.types.find((it) => it.name === checkedTypeName);
         this._newEventData.type.isChecked = true;
