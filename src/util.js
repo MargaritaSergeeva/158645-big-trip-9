@@ -1,8 +1,8 @@
 import constant from './constant.js';
 
 const SINGLE_DIGIT_LIMIT = 10;
-const MIN_MS_COUNT = 360000;
-const MAX_MS_COUNT = 36000000;
+const MIN_MS_COUNT = 36000;
+const MAX_MS_COUNT = 360000000;
 
 export default {
   getScale(min, max) {
@@ -47,13 +47,13 @@ export default {
         title = `Flight to`;
         break;
       case `check-in`:
-        title = `Check into`;
+        title = `Check in`;
         break;
       case `sightseeing`:
-        title = `Sightseeing at`;
+        title = `Sightseeing in`;
         break;
       case `restaurant`:
-        title = `Restaurant at`;
+        title = `Restaurant in`;
         break;
       default:
         title = `Trip to`;

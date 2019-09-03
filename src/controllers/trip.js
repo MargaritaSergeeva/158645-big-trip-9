@@ -1,19 +1,25 @@
 import constant from '../constant.js';
 import util from '../util.js';
+import cloneDeep from 'lodash/clonedeep';
 import {getSortingData} from '../data.js';
 import TripSorting from '../components/trip-sorting.js';
 import TripDaysList from '../components/trip-days-list.js';
+import {EventController} from './event.js';
 import TripDayItem from '../components/trip-day-item.js';
-import EventEdit from '../components/event-edit.js';
-import Event from '../components/event.js';
 
 export class TripController {
-  constructor(containerEvents, sortedEvents, unicDays) {
+  constructor(containerEvents, events, unicDays) {
     this._containerEvents = containerEvents;
-    this._sortedEvents = sortedEvents;
+    this._events = events;
     this._unicDays = unicDays;
     this._tripDaysList = new TripDaysList();
     this._tripSorting = new TripSorting(getSortingData());
+    this._onChangeView = this._onChangeView.bind(this);
+    this._onDataChange = this._onDataChange.bind(this);
+    this._cloneEvents = cloneDeep(this._events);
+    this._sortedEvents = this._cloneEvents;
+    this._isSorted = false;
+    this._subscriptions = [];
   }
 
   init() {
@@ -21,83 +27,79 @@ export class TripController {
     this._tripSorting.getElement().addEventListener(`click`, (evt) => this._onSortingLinkClick(evt));
 
     util.render(this._containerEvents, this._tripDaysList.getElement(), constant.Position.BEFOREEND);
-    this._renderTripDayItem(this._sortedEvents, this._unicDays, this._tripDaysList.getElement());
+    this._renderTripDays(this._events, this._unicDays, this._tripDaysList.getElement());
   }
 
-  _renderEvent(eventItem, eventContainer) {
-    const event = new Event(eventItem);
-    const eventEdit = new EventEdit(eventItem);
 
-    const onEscKeyDown = (evt) => {
-      if (evt.key === `Escape` || evt.key === `Esc`) {
-        eventContainer.replaceChild(event.getElement(), eventEdit.getElement());
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
+  _onDataChange(newData, oldData) {
+    this._sortedEvents[this._sortedEvents.findIndex((it) => it === oldData)] = newData;
+    this._cloneEvents[this._cloneEvents.findIndex((it) => it === oldData)] = newData;
 
-    event.getElement()
-      .querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, () => {
-        eventContainer.replaceChild(eventEdit.getElement(), event.getElement());
-        document.addEventListener(`keydown`, onEscKeyDown);
-      });
+    this._tripDaysList.getElement().innerHTML = ``;
 
-    eventEdit.getElement()
-    .querySelector(`.event__rollup-btn`)
-    .addEventListener(`click`, () => {
-      eventContainer.replaceChild(event.getElement(), eventEdit.getElement());
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
-
-    eventEdit.getElement()
-      .querySelector(`form`)
-      .addEventListener(`submit`, () => {
-        eventContainer.replaceChild(event.getElement(), eventEdit.getElement());
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      });
-
-    util.render(eventContainer, event.getElement(), constant.Position.BEFOREEND);
+    if (this._isSorted) {
+      this._renderTripDay(this._sortedEvents, this._tripDaysList.getElement());
+    } else {
+      this._renderTripDays(this._cloneEvents, this._unicDays, this._tripDaysList.getElement());
+    }
   }
 
-  _renderEvents(day, eventsArr, container) {
-    eventsArr
-    .filter(({timeStart}) => (new Date(timeStart)).toDateString() === day)
-    .forEach((eventItem) => this._renderEvent(eventItem, container));
+
+  _onChangeView() {
+    this._subscriptions.forEach((it) => it());
   }
 
-  _renderTripDayItem(eventsArr, daysArr, container) {
+
+  _renderTripDays(eventsArr, daysArr, container) {
     daysArr.forEach((day, index) => {
-      const tripDayItem = new TripDayItem(day, index).getElement();
+      const eventsForDay = eventsArr
+      .filter(({timeStart}) => (new Date(timeStart)).toDateString() === day);
+      const tripDayItem = new TripDayItem(eventsForDay.length, day, index).getElement();
+      const tripEventsItems = tripDayItem.querySelectorAll(`.trip-events__item`);
+
       util.render(container, tripDayItem, constant.Position.BEFOREEND);
-      const tripEventsList = tripDayItem.querySelector(`.trip-events__list`);
-      this._renderEvents(day, eventsArr, tripEventsList);
+      Array.from(tripEventsItems).forEach((it, i) => this._renderEvent(it, eventsForDay[i]));
     });
   }
+
+  _renderTripDay(eventsArr, container) {
+    const tripDayItem = new TripDayItem(eventsArr.length).getElement();
+    const tripEventsItems = tripDayItem.querySelectorAll(`.trip-events__item`);
+
+    util.render(container, tripDayItem, constant.Position.BEFOREEND);
+    Array.from(tripEventsItems).forEach((it, i) => this._renderEvent(it, eventsArr[i]));
+  }
+
+
+  _renderEvent(container, event) {
+    const eventController = new EventController(container, event, this._onDataChange, this._onChangeView);
+    this._subscriptions.push(eventController.setDefaultView.bind(eventController));
+  }
+
 
   _onSortingLinkClick(evt) {
     if (evt.target.tagName !== `LABEL`) {
       return;
     }
 
-    const tripDayItem = new TripDayItem().getElement();
     this._tripDaysList.getElement().innerHTML = ``;
 
     switch (evt.target.dataset.sortType) {
       case `time`:
         const getDuration = (obj) => obj.timeEnd - obj.timeStart;
-        const sortedByTimeEvents = this._sortedEvents.slice().sort((a, b) => getDuration(b) - getDuration(a));
-
-        util.render(this._tripDaysList.getElement(), tripDayItem, constant.Position.BEFOREEND);
-        sortedByTimeEvents.forEach((event) => this._renderEvent(event, tripDayItem.querySelector(`.trip-events__list`)));
+        this._sortedEvents = this._cloneEvents.slice().sort((a, b) => getDuration(b) - getDuration(a));
+        this._renderTripDay(this._sortedEvents, this._tripDaysList.getElement());
+        this._isSorted = true;
         break;
       case `price`:
-        const sortedByPriceEvents = this._sortedEvents.slice().sort((a, b) => b.price - a.price);
-
-        util.render(this._tripDaysList.getElement(), tripDayItem, constant.Position.BEFOREEND);
-        sortedByPriceEvents.forEach((event) => this._renderEvent(event, tripDayItem.querySelector(`.trip-events__list`)));
+        this._sortedEvents = this._cloneEvents.slice().sort((a, b) => b.price - a.price);
+        this._renderTripDay(this._sortedEvents, this._tripDaysList.getElement());
+        this._isSorted = true;
         break;
       case `event`:
-        this._renderTripDayItem(this._sortedEvents, this._unicDays, this._tripDaysList.getElement());
+        this._sortedEvents = this._cloneEvents;
+        this._renderTripDays(this._sortedEvents, this._unicDays, this._tripDaysList.getElement());
+        this._isSorted = false;
         break;
     }
   }
