@@ -90,7 +90,7 @@ export class EventController {
     this._newEventData.type.isChecked = true;
     if (this._newEventData.type.options) {
       this._newEventData.type.options.forEach((option) => {
-        option.isChecked = formData.getAll(`event-offer`).some((it) => it === option.name) ? true : false;
+        option.isChecked = formData.getAll(`event-offer`).some((it) => it === option.name);
       });
     }
     this._newEventData.timeStart = formData.get(`event-start-time`) ? +moment(formData.get(`event-start-time`), `DD/MM/YY HH:mm`).format(`x`) : ``;
