@@ -8,8 +8,6 @@ import {TripController} from './controllers/trip.js';
 import MessageNoEvents from './components/message-no-events.js';
 
 const EVENT_ITEM_COUNT = 20;
-const MIN_OPTION_COUNT = 0;
-const MAX_OPTION_COUNT = 2;
 
 const headerElement = document.querySelector(`.page-header`);
 const tripInfoElement = headerElement.querySelector(`.trip-info`);
@@ -23,10 +21,8 @@ let totalPrice = 0;
 
 events.forEach((it) => {
   it.city = it.cities[util.getRandomIndex(it.cities)];
-  it.type = it.types[util.getRandomIndex(it.types)].name;
-  it.checkedOptions = it.options
-    .filter((option) => option.isChecked)
-    .splice(MIN_OPTION_COUNT, Math.round(Math.random() * MAX_OPTION_COUNT));
+  it.type = it.types[util.getRandomIndex(it.types)];
+  it.type.isChecked = true;
   it.timeEnd = it.timeStart + util.getMs();
 });
 
