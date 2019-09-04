@@ -1,6 +1,5 @@
 import constant from '../constant.js';
 import util from '../util.js';
-import cloneDeep from 'lodash/clonedeep';
 import {getSortingData} from '../data.js';
 import TripSorting from '../components/trip-sorting.js';
 import TripDaysList from '../components/trip-days-list.js';
@@ -16,7 +15,7 @@ export class TripController {
     this._tripSorting = new TripSorting(getSortingData());
     this._onChangeView = this._onChangeView.bind(this);
     this._onDataChange = this._onDataChange.bind(this);
-    this._cloneEvents = cloneDeep(this._events);
+    this._cloneEvents = this._events;
     this._sortedEvents = this._cloneEvents;
     this._isSorted = false;
     this._subscriptions = [];
@@ -33,13 +32,18 @@ export class TripController {
 
   _onDataChange(newData, oldData) {
     this._sortedEvents[this._sortedEvents.findIndex((it) => it === oldData)] = newData;
-    this._cloneEvents[this._cloneEvents.findIndex((it) => it === oldData)] = newData;
+    const i = this._cloneEvents.findIndex((it) => it === oldData);
+    this._cloneEvents[i] = newData;
 
     this._tripDaysList.getElement().innerHTML = ``;
 
     if (this._isSorted) {
       this._renderTripDay(this._sortedEvents, this._tripDaysList.getElement());
     } else {
+      this._unicDays = Array.from(new Set(this._cloneEvents
+        .sort((left, right) => left.timeStart - right.timeStart)
+        .map(({timeStart}) => new Date(timeStart).toDateString()
+        )));
       this._renderTripDays(this._cloneEvents, this._unicDays, this._tripDaysList.getElement());
     }
   }
