@@ -9,31 +9,45 @@ import EventEdit from '../components/event-edit.js';
 import Event from '../components/event.js';
 
 export class EventController {
-  constructor(container, eventData, onDataChange, onChangeView) {
+  constructor(container, eventData, mode, onChangeView, onDataChange) {
     this._container = container;
     this._eventData = eventData;
     this._onDataChange = onDataChange;
     this._onChangeView = onChangeView;
-    this._eventView = new Event(eventData);
+    this._eventView = mode === constant.Mode.DEFAULT ? new Event(eventData) : null;
     this._eventEdit = new EventEdit(eventData);
     this._newEventData = this._eventData;
+    this._mode = mode;
 
-    this.init();
+    this.init(this._mode);
   }
 
-  init() {
+  init(mode) {
     const startTimeInputElement = this._eventEdit.getElement().querySelector(`#event-start-time-1`);
     const endTimeInputElement = this._eventEdit.getElement().querySelector(`#event-end-time-1`);
     const formEditElement = this._eventEdit.getElement().querySelector(`.event--edit`);
-    const eventViewRollUpBtnElement = this._eventView.getElement().querySelector(`.event__rollup-btn`);
-    const eventEditRollUpBtnElement = this._eventEdit.getElement().querySelector(`.event__rollup-btn`);
+    const closeBtnElement = this._eventEdit.getElement().querySelector(`.event__rollup-btn`);
+    const deleteBtnElement = this._eventEdit.getElement().querySelector(`.event__reset-btn`);
+
+    let currentView = this._eventView;
 
     const onEscKeyDown = (evt) => {
       if (keyBoard.isEscPressed(evt)) {
-        this._container.replaceChild(this._eventView.getElement(), this._eventEdit.getElement());
+        if (mode === constant.Mode.ADDING) {
+          this._container.removeChild(currentView.getElement());
+          this._onDataChange();
+        } else {
+          this._container.replaceChild(this._eventView.getElement(), this._eventEdit.getElement());
+        }
+
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
     };
+
+    if (mode === constant.Mode.ADDING) {
+      currentView = this._eventEdit;
+      document.addEventListener(`keydown`, onEscKeyDown);
+    }
 
     const startTimeCalendar = flatpickr(startTimeInputElement, {
       altInput: true,
@@ -59,13 +73,16 @@ export class EventController {
       },
     });
 
-    eventViewRollUpBtnElement.addEventListener(`click`, () => {
-      this._onChangeView();
-      this._container.replaceChild(this._eventEdit.getElement(), this._eventView.getElement());
-      document.addEventListener(`keydown`, onEscKeyDown);
-    });
+    if (this._eventView) {
+      const openBtnElement = this._eventView.getElement().querySelector(`.event__rollup-btn`);
+      openBtnElement.addEventListener(`click`, () => {
+        this._onChangeView();
+        this._container.replaceChild(this._eventEdit.getElement(), this._eventView.getElement());
+        document.addEventListener(`keydown`, onEscKeyDown);
+      });
+    }
 
-    eventEditRollUpBtnElement.addEventListener(`click`, () => {
+    closeBtnElement.addEventListener(`click`, () => {
       this._container.replaceChild(this._eventView.getElement(), this._eventEdit.getElement());
       document.removeEventListener(`keydown`, onEscKeyDown);
     });
@@ -76,7 +93,12 @@ export class EventController {
       document.removeEventListener(`keydown`, onEscKeyDown);
     });
 
-    util.render(this._container, this._eventView.getElement(), constant.Position.BEFOREEND);
+    deleteBtnElement.addEventListener(`click`, () => {
+      this._onDataChange(null, this._taskData);
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    });
+
+    util.render(this._container, currentView.getElement(), constant.Position.BEFOREEND);
   }
 
   setDefaultView() {
@@ -101,11 +123,15 @@ export class EventController {
     }
     this._newEventData.timeStart = formData.get(`event-start-time`) ? +moment(formData.get(`event-start-time`), `DD/MM/YY HH:mm`).format(`x`) : ``;
     this._newEventData.timeEnd = formData.get(`event-end-time`) ? +moment(formData.get(`event-end-time`), `DD/MM/YY HH:mm`).format(`x`) : ``;
-    this._newEventData.price = formData.get(`event-price`);
+    this._newEventData.price = +formData.get(`event-price`);
     this._newEventData.isFavorite = favoriteInputElement.checked;
     this._newEventData.city = this._newEventData.cities.find((city) => city.name === formData.get(`event-destination`));
 
-    this._onDataChange(this._newEventData, this._eventData);
+    this._onDataChange(this._newEventData, this._mode === constant.Mode.DEFAULT ? this._eventData : null);
+
+    if (this._mode === constant.Mode.ADDING) {
+      this._eventView = new Event(this._newEventData);
+    }
 
     this._container.replaceChild(this._eventView.getElement(), this._eventEdit.getElement());
   }

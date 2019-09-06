@@ -13,7 +13,7 @@ const LetterNumber = {
 };
 
 export default class TripDayItem extends AbstractComponent {
-  constructor(eventsCount, day, index) {
+  constructor(eventsCount = 1, day, index) {
     super();
     this._day = day;
     this._eventsCount = eventsCount;
