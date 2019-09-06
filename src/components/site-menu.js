@@ -8,9 +8,9 @@ export default class SiteMenu extends AbstractComponent {
 
   getTemplate() {
     return `<nav class="trip-controls__trip-tabs  trip-tabs">
-      ${this._menuData.map(({name, isActive}) => `<a class="trip-tabs__btn
+      ${this._menuData.map(({name, isActive}) => `<a class="trip-tabs__btn trip-tabs__btn--${name}
       ${isActive ? ` trip-tabs__btn--active` : ``}"
-      href="#">${name}</a>`
+      href="#">${name[0].toUpperCase() + name.slice(1)}</a>`
         .trim())
         .join(``)}
     </nav>`.trim();

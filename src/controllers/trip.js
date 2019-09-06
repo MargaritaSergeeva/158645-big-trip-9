@@ -7,10 +7,11 @@ import {EventController} from './event.js';
 import TripDayItem from '../components/trip-day-item.js';
 
 export class TripController {
-  constructor(containerEvents, events, unicDays) {
+  constructor(containerEvents, onDataChange) {
     this._containerEvents = containerEvents;
-    this._events = events;
-    this._unicDays = unicDays;
+    this._onDataChangeMain = onDataChange;
+    this._events = [];
+    this._unicDays = [];
     this._tripDaysList = new TripDaysList();
     this._tripSorting = new TripSorting(getSortingData());
     this._onChangeView = this._onChangeView.bind(this);
@@ -21,12 +22,34 @@ export class TripController {
     this._subscriptions = [];
   }
 
-  init() {
+  hide() {
+    this._containerEvents.classList.add(`visually-hidden`);
+  }
+
+  show(events) {
+    if (events !== this._events) {
+      this._setEvents(events);
+    }
+
+    this._containerEvents.classList.remove(`visually-hidden`);
+  }
+
+  _renderTrip() {
     util.render(this._containerEvents, this._tripSorting.getElement(), constant.Position.BEFOREEND);
     this._tripSorting.getElement().addEventListener(`click`, (evt) => this._onSortingLinkClick(evt));
 
     util.render(this._containerEvents, this._tripDaysList.getElement(), constant.Position.BEFOREEND);
     this._renderTripDays(this._events, this._unicDays, this._tripDaysList.getElement());
+  }
+
+  _setEvents(events) {
+    this._events = events;
+
+    this._unicDays = Array.from(new Set(this._events
+      .map(({timeStart}) => new Date(timeStart).toDateString()
+      )));
+
+    this._renderTrip();
   }
 
 
@@ -46,6 +69,8 @@ export class TripController {
         )));
       this._renderTripDays(this._cloneEvents, this._unicDays, this._tripDaysList.getElement());
     }
+
+    this._onDataChangeMain(this._sortedEvents);
   }
 
 
@@ -58,6 +83,7 @@ export class TripController {
     daysArr.forEach((day, index) => {
       const eventsForDay = eventsArr
       .filter(({timeStart}) => (new Date(timeStart)).toDateString() === day);
+
       const tripDayItem = new TripDayItem(eventsForDay.length, day, index).getElement();
       const tripEventsItems = tripDayItem.querySelectorAll(`.trip-events__item`);
 

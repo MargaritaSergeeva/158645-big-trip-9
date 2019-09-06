@@ -276,11 +276,11 @@ export const getEventData = () => ({
 
 export const getMenuData = () => ([
   {
-    name: `Table`,
+    name: `table`,
     isActive: true,
   },
   {
-    name: `Stats`,
+    name: `stats`,
     isActive: false,
   },
 ]);

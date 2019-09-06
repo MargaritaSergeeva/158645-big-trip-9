@@ -35,22 +35,28 @@ export class EventController {
       }
     };
 
-    flatpickr(startTimeInputElement, {
+    const startTimeCalendar = flatpickr(startTimeInputElement, {
       altInput: true,
-      allowInput: true,
       defaultDate: this._eventEdit.timeStart,
       enableTime: true,
       altFormat: `d/m/y H:i`,
       dateFormat: `d/m/y H:i`,
+      maxDate: endTimeInputElement.value,
+      onChange(selDates, dateStr) {
+        endTimeCalendar.set(`minDate`, dateStr);
+      },
     });
 
-    flatpickr(endTimeInputElement, {
+    const endTimeCalendar = flatpickr(endTimeInputElement, {
       altInput: true,
-      allowInput: true,
       defaultDate: this._eventEdit.timeStart,
       enableTime: true,
       altFormat: `d/m/y H:i`,
       dateFormat: `d/m/y H:i`,
+      minDate: startTimeInputElement.value,
+      onChange(selDates, dateStr) {
+        startTimeCalendar.set(`maxDate`, dateStr);
+      },
     });
 
     eventViewRollUpBtnElement.addEventListener(`click`, () => {
