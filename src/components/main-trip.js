@@ -17,7 +17,7 @@ export default class MainTrip extends AbstractComponent {
 
   getTemplate() {
     return `<div class="trip-info__main">
-      <h1 class="trip-info__title">${this._cities[0]} &mdash; ... &mdash; ${this._cities[this._cities.length - 1]}</h1>
+      <h1 class="trip-info__title">${this._cities[0].name} &mdash; ... &mdash; ${this._cities[this._cities.length - 1].name}</h1>
       <p class="trip-info__dates">${getMonthAndDate(this._days[0])}&nbsp;&mdash;&nbsp;${getMonthAndDate(this._days[this._days.length - 1])}</p>
     </div>`.trim();
   }

@@ -1,6 +1,7 @@
 import constant from '../constant.js';
 import AbstractComponent from './abstract-component.js';
 
+const DEFAULT_DAY_COUNT = 1;
 const LetterNumber = {
   FIRST_OF_YEAR: 8,
   LAST_OF_YEAR: 10,
@@ -12,8 +13,9 @@ const LetterNumber = {
   LAST_OF_MONTH_DAY: 11,
 };
 
+
 export default class TripDayItem extends AbstractComponent {
-  constructor(eventsCount, day, index) {
+  constructor(eventsCount = DEFAULT_DAY_COUNT, day, index) {
     super();
     this._day = day;
     this._eventsCount = eventsCount;

@@ -9,15 +9,15 @@ export default class EventEdit extends AbstractComponent {
     this._types = events.types;
     this._type = events.type;
     this._cities = events.cities;
-    this._city = events.city;
+    this._city = events.city ? events.city : null;
     this._options = events.type.options;
     this._timeStart = events.timeStart;
     this._timeEnd = events.timeEnd;
     this._price = events.price;
-    this._description = events.city.description;
-    this._photos = events.city.photos;
+    this._description = events.city ? events.city.description : null;
+    this._photos = events.city ? events.city.photos : null;
     this._isFavorite = events.isFavorite;
-    this._event = this.getElement();
+    this._eventElement = this.getElement();
 
     this._subscribeOnEvents();
   }
@@ -62,7 +62,7 @@ export default class EventEdit extends AbstractComponent {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${util.getEventTitle(this._type.name)}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._city.name}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._city ? `${this._city.name}` : ``}" list="destination-list-1">
             <datalist id="destination-list-1">
               ${this._cities.map((it) => `<option value="${it.name}"></option>`
               .trim())
@@ -103,11 +103,11 @@ export default class EventEdit extends AbstractComponent {
           </label>
 
           <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
+            <span class="visually-hidden">Close event</span>
           </button>
         </header>
 
-        <section class="event__details">
+        <section class="event__details ${this._city ? `` : ` visually-hidden`}">
 
           <section class="event__section  event__section--offers">
               ${this._options ? `<h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -127,15 +127,15 @@ export default class EventEdit extends AbstractComponent {
             </div>
           </section>
 
-          <section class="event__section  event__section--destination">
+          <section class="event__section  event__section--destination ${this._city ? `` : ` visually-hidden`}">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${this._description}</p>
+            <p class="event__destination-description">${this._description ? `${this._description}` : ``}</p>
 
             <div class="event__photos-container">
               <div class="event__photos-tape">
-                ${this._photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`
+                ${this._photos ? `${this._photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`
                 .trim())
-                .join(``)}
+                .join(``)}` : ``}
               </div>
             </div>
           </section>
@@ -169,7 +169,7 @@ export default class EventEdit extends AbstractComponent {
           .trim())
           .join(``)}
         </div>
-      </div>;`;
+      </div>`;
   }
 
   _isTypeChecked(currentTypeName, checkedTypeName) {
@@ -181,41 +181,56 @@ export default class EventEdit extends AbstractComponent {
   }
 
   _subscribeOnEvents() {
-    const offersElement = this._event.querySelector(`.event__section--offers`);
+    const offersElement = this._eventElement.querySelector(`.event__section--offers`);
     offersElement.addEventListener(`click`, (evt) => {
       evt.preventDefault();
 
       if (util.isElementContainsClass(evt.target, `event__offer-label`)) {
-        const inputElement = this._event.querySelector(`#${evt.target.htmlFor}`);
+        const inputElement = this._eventElement.querySelector(`#${evt.target.htmlFor}`);
         this._switchCheckingElement(inputElement);
       }
 
       if (util.isElementContainsClass(evt.target.parentNode, `event__offer-label`)) {
-        const inputElement = this._event.querySelector(`#${evt.target.parentNode.htmlFor}`);
+        const inputElement = this._eventElement.querySelector(`#${evt.target.parentNode.htmlFor}`);
         this._switchCheckingElement(inputElement);
       }
     });
 
-    const typeGroupElement = this._event.querySelector(`.event__type-group`);
+    const typeGroupElement = this._eventElement.querySelector(`.event__type-group`);
     typeGroupElement.addEventListener(`click`, (evt) => {
 
       if (util.isElementContainsClass(evt.target, `event__type-label`)) {
-        const icon = this._event.querySelector(`.event__type-icon`);
+        const icon = this._eventElement.querySelector(`.event__type-icon`);
         icon.src = `img/icons/${evt.target.textContent}.png`;
 
-        const eventPlaceholder = this._event.querySelector(`.event__label`);
+        const eventPlaceholder = this._eventElement.querySelector(`.event__label`);
         eventPlaceholder.textContent = util.getEventTitle(evt.target.textContent);
 
+        const eventDetailsElement = this._eventElement.querySelector(`.event__details`);
+        const sectionDestinationElement = this._eventElement.querySelector(`.event__section--destination`);
         const options = this._types.find((type) => type.name === evt.target.textContent).options ? this._types.find((type) => type.name === evt.target.textContent).options : ``;
+
+
+        if (util.isElementContainsClass(sectionDestinationElement, `visually-hidden`)) {
+          if (options) {
+            eventDetailsElement.classList.remove(`visually-hidden`);
+          } else {
+            eventDetailsElement.classList.add(`visually-hidden`);
+          }
+        }
+
         util.cleanElement(offersElement);
         offersElement.insertAdjacentHTML(constant.Position.BEFOREEND, `${options ? this._getOffersTemplate(options) : ``}`);
       }
     });
 
-    const inputDestinationElement = this._event.querySelector(`.event__input--destination`);
+    const inputDestinationElement = this._eventElement.querySelector(`.event__input--destination`);
     inputDestinationElement.addEventListener(`change`, (evt) => {
       const newCity = this._cities.find((city) => city.name === evt.target.value);
-      const sectionDestinationElement = this._event.querySelector(`.event__section--destination`);
+      const sectionDestinationElement = this._eventElement.querySelector(`.event__section--destination`);
+      const eventDetailsElement = this._eventElement.querySelector(`.event__details`);
+      eventDetailsElement.classList.remove(`visually-hidden`);
+      sectionDestinationElement.classList.remove(`visually-hidden`);
       util.cleanElement(sectionDestinationElement);
       sectionDestinationElement.insertAdjacentHTML(constant.Position.BEFOREEND, this._getDestinationTemplate(newCity));
     });
