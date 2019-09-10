@@ -20,16 +20,25 @@ export class TripController {
     this._isSorted = false;
     this._subscriptions = [];
     this._creatingEvent = null;
+
+    this._init();
   }
 
   hide() {
     this._containerEvents.classList.add(`visually-hidden`);
   }
 
+  clean() {
+    util.unrender(this._tripDaysList.getElement());
+    this._tripDaysList.removeElement();
+  }
+
   show(events) {
     if (events !== this._events) {
-      this._setEvents(events);
+      this._setEventsData(events);
     }
+
+    this._renderTrip();
 
     this._containerEvents.classList.remove(`visually-hidden`);
   }
@@ -51,23 +60,23 @@ export class TripController {
     });
   }
 
-  _renderTrip() {
+  _init() {
     util.render(this._containerEvents, this._tripSorting.getElement(), constant.Position.BEFOREEND);
     this._tripSorting.getElement().addEventListener(`click`, (evt) => this._onSortingLinkClick(evt));
+  }
 
+  _renderTrip() {
     util.render(this._containerEvents, this._tripDaysList.getElement(), constant.Position.BEFOREEND);
     this._renderTripDays(this._events, this._unicDays, this._tripDaysList.getElement());
   }
 
-  _setEvents(events) {
+  _setEventsData(events) {
     this._events = events;
     this._sortedEvents = this._events;
 
     this._unicDays = Array.from(new Set(this._events
       .map(({timeStart}) => new Date(timeStart).toDateString()
       )));
-
-    this._renderTrip();
   }
 
 

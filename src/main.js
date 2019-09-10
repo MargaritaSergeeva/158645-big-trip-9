@@ -2,10 +2,10 @@ import util from './util.js';
 import constant from './constant.js';
 import {getEventData, getMenuData, getFilterData} from './data.js';
 import SiteMenu from './components/site-menu.js';
-import MainTrip from './components/main-trip.js';
+import MainTrip from './components/title-trip.js';
 import Filter from './components/filter.js';
-import Statistics from './components/statistics.js';
 import {TripController} from './controllers/trip.js';
+import {StatisticsController} from './controllers/statistics.js';
 import MessageNoEvents from './components/message-no-events.js';
 
 const EVENT_ITEM_COUNT = 20;
@@ -42,9 +42,9 @@ let cities = sortedEvents
 const siteMenuComponent = new SiteMenu(getMenuData());
 const filterComponent = new Filter(getFilterData());
 const messageNoEventsComponent = new MessageNoEvents();
-let statisticComponent;
-let tripController;
-let mainTripComponent;
+const statisticsController = new StatisticsController(mainBodyContainer);
+
+let titleTripComponent;
 
 const renderTotalPrice = (eventsArr) => {
   let totalPrice = 0;
@@ -70,13 +70,16 @@ const onDataChange = (newEvents) => {
   renderHeaderBlocks();
 };
 
+const tripController = new TripController(tripEventsElement, onDataChange);
+
 const onSiteMenuClick = (evt) => {
   if (util.isElementContainsClass(evt.target, `trip-tabs__btn`)) {
     if (util.isElementContainsClass(evt.target, `trip-tabs__btn--stats`)) {
-      statisticComponent.getElement().classList.remove(`visually-hidden`);
+      statisticsController.show(sortedEvents);
+      tripController.clean();
       tripController.hide();
     } else {
-      statisticComponent.getElement().classList.add(`visually-hidden`);
+      statisticsController.hide();
       tripController.show(sortedEvents);
     }
 
@@ -94,20 +97,14 @@ const onNewEventBtnClick = () => {
 
 const renderHeaderBlocks = () => {
   if (sortedEvents.length > 0) {
-    if (mainTripComponent && statisticComponent) {
-      util.unrender(mainTripComponent.getElement());
-      mainTripComponent.removeElement();
-
-      util.unrender(statisticComponent.getElement());
-      statisticComponent.removeElement();
+    if (titleTripComponent) {
+      util.unrender(titleTripComponent.getElement());
+      titleTripComponent.removeElement();
     }
 
-    mainTripComponent = new MainTrip(cities, unicDays);
-    statisticComponent = new Statistics();
+    titleTripComponent = new MainTrip(cities, unicDays);
 
-    util.render(tripInfoElement, mainTripComponent.getElement(), constant.Position.AFTERBEGIN);
-    util.render(mainBodyContainer, statisticComponent.getElement(), constant.Position.AFTERBEGIN);
-    statisticComponent.getElement().classList.add(`visually-hidden`);
+    util.render(tripInfoElement, titleTripComponent.getElement(), constant.Position.AFTERBEGIN);
     renderTotalPrice(sortedEvents);
   } else {
     util.render(tripEventsElement, messageNoEventsComponent.getElement(), constant.Position.BEFOREEND);
@@ -116,7 +113,6 @@ const renderHeaderBlocks = () => {
 
 const renderTripBlock = () => {
   if (sortedEvents.length > 0) {
-    tripController = new TripController(tripEventsElement, onDataChange);
     tripController.show(sortedEvents);
   }
 };
