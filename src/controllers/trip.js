@@ -21,13 +21,14 @@ export class TripController {
     this._isSorted = false;
     this._subscriptions = [];
     this._creatingEvent = null;
+    this._filterMode = null;
   }
 
   hide() {
     this._containerEvents.classList.add(`visually-hidden`);
   }
 
-  _clean() {
+  clean() {
     if (this._containerEvents.contains(this._tripDaysList.getElement())) {
       util.unrender(this._tripSorting.getElement());
       util.unrender(this._tripDaysList.getElement());
@@ -36,9 +37,9 @@ export class TripController {
     }
   }
 
-  show(allEvents, workingEvents) {
-    this._setEventsData(allEvents, workingEvents);
-    this._clean();
+  show(allEvents, workingEvents, filterMode) {
+    this._setEventsData(allEvents, workingEvents, filterMode);
+    this.clean();
     this._renderTrip();
 
     this._containerEvents.classList.remove(`visually-hidden`);
@@ -69,10 +70,11 @@ export class TripController {
     this._renderTripDays(this._workingEvents, this._unicDays, this._tripDaysList.getElement());
   }
 
-  _setEventsData(allEvents, workingEvents) {
+  _setEventsData(allEvents, workingEvents, filterMode) {
     this._allEvents = allEvents;
     this._workingEvents = workingEvents;
     this._sortedEvents = this._workingEvents;
+    this._filterMode = filterMode;
 
     this._unicDays = Array.from(new Set(this._workingEvents
       .map(({timeStart}) => new Date(timeStart).toDateString()
@@ -118,6 +120,27 @@ export class TripController {
       .sort((left, right) => left.timeStart - right.timeStart)
       .map(({timeStart}) => new Date(timeStart).toDateString()
       )));
+
+    switch (this._filterMode) {
+      case constant.FilterMode.EVERYTHING:
+        break;
+      case constant.FilterMode.FUTURE:
+        this._sortedEvents = this._sortedEvents.filter(({timeStart}) => timeStart > Date.now());
+        this._workingEvents = this._workingEvents.filter(({timeStart}) => timeStart > Date.now());
+        this._unicDays = Array.from(new Set(this._workingEvents
+          .sort((left, right) => left.timeStart - right.timeStart)
+          .map(({timeStart}) => new Date(timeStart).toDateString()
+          )));
+        break;
+      case constant.FilterMode.PAST:
+        this._sortedEvents = this._sortedEvents.filter(({timeEnd}) => timeEnd < Date.now());
+        this._workingEvents = this._sortedEvents.filter(({timeEnd}) => timeEnd < Date.now());
+        this._unicDays = Array.from(new Set(this._workingEvents
+          .sort((left, right) => left.timeStart - right.timeStart)
+          .map(({timeStart}) => new Date(timeStart).toDateString()
+          )));
+        break;
+    }
   }
 
   _onChangeView() {

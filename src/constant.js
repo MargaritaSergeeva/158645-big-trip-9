@@ -10,6 +10,12 @@ export default {
     DEFAULT: `default`,
   },
 
+  FilterMode: {
+    EVERYTHING: `everything`,
+    FUTURE: `future`,
+    PAST: `past`,
+  },
+
   monthMap: {
     'Jan': `01`,
     'Feb': `02`,
