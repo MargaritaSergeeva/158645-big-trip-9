@@ -94,7 +94,7 @@ export class EventController {
     });
 
     deleteBtnElement.addEventListener(`click`, () => {
-      this._onDataChange(null, this._taskData);
+      this._onDataChange(null, this._eventData);
       document.removeEventListener(`keydown`, onEscKeyDown);
     });
 

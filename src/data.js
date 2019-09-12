@@ -269,7 +269,7 @@ export const getEventData = () => ({
       .join(`. `),
     },
   ],
-  timeStart: Date.now() - getWeekInMs() - util.getMs(),
+  timeStart: Date.now() - getWeekInMs() - util.getMs() + getWeekInMs(),
   price: util.getScale(MIN_PRICE, MAX_PRICE),
   isFavorite: util.getRandomBoolean(),
 });
